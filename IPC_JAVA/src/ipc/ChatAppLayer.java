@@ -84,8 +84,9 @@ public class ChatAppLayer implements BaseLayer {
 	public synchronized boolean Receive(byte[] input) {
 		byte[] data;
 		byte[] temp_src = intToByte4(m_sHeader.capp_src);
-		for (int i = 0; i < 2; i++) {
+		for (int i = 0; i < 4; i++) {
 			if (input[i] != temp_src[i]) {
+				System.out.println("no recieve");
 				return false;
 			}
 		}
@@ -96,11 +97,16 @@ public class ChatAppLayer implements BaseLayer {
 	}
 
 	byte[] intToByte4(int value) {
-		byte[] temp = new byte[2];
-		temp[1] = (byte) (value >> 8);
-		temp[0] = (byte) value;
-
+				
+		byte[] temp = new byte[4];
+		
+		temp[0] |= (byte) ((value & 0xFF000000) >> 24);
+		temp[1] |= (byte) ((value & 0xFF0000) >> 16);
+		temp[2] |= (byte) ((value & 0xFF00) >> 8);
+		temp[3] |= (byte) (value & 0xFF);
+		
 		return temp;
+		
 	}
 
 	@Override
