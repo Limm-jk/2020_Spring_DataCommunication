@@ -49,7 +49,7 @@ public class LayerManager {
 		return null;
 	}
 	
-	public void ConnectLayers(String pcList){
+	public void ConnectLayers(String pcList){//레이어들을 연결
 		MakeList(pcList);
 		LinkLayer(mp_sListHead);		
 	}

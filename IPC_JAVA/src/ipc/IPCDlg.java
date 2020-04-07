@@ -151,12 +151,43 @@ public class IPCDlg extends JFrame implements BaseLayer {//JFrame사용한 인터페이
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			/*
-			 * 
 			 * 과제 Setting 버튼과 Send 버튼을 누를 시 행동
-			 * 
 			 * Setting 버튼 누를 시 SocketLayer에서 포트 설정
-			 * 
 			 */
+			if(e.getSource() == Setting_Button){
+				if(Setting_Button.getText() == "Reset"){
+					srcAddress.setText("");
+					dstAddress.setText("");
+					dstAddress.setEnabled(true);
+					srcAddress.setEnabled(true);
+					Setting_Button.setText("Setting");
+				}
+				else{
+					String Ssrc = srcAddress.getText();
+					String Sdst = dstAddress.getText();
+					int src = Integer.parseInt(Ssrc);
+					int dst = Integer.parseInt(Sdst);
+					((SocketLayer) m_LayerMgr.GetLayer("Socket")).setClientPort(dst);
+					((SocketLayer) m_LayerMgr.GetLayer("Socket")).setServerPort(src);
+					((ChatAppLayer) m_LayerMgr.GetLayer("Chat")).SetEnetSrcAddress(src);
+					((ChatAppLayer) m_LayerMgr.GetLayer("Chat")).SetEnetDstAddress(dst);
+					((SocketLayer) m_LayerMgr.GetLayer("Socket")).Receive();
+					Setting_Button.setText("Reset");
+					dstAddress.setEnabled(false);
+					srcAddress.setEnabled(false);
+				}
+			}
+			if(e.getSource() == Chat_send_Button){
+				if(Setting_Button.getText() == "Reset"){
+					String writtenChat = ChattingWrite.getText();
+					ChattingArea.append("[Send] : " + writtenChat +"\n");
+					byte[] sendChat = writtenChat.getBytes();
+					((ChatAppLayer) m_LayerMgr.GetLayer("Chat")).Send(sendChat, sendChat.length);
+				}
+				else{
+					ChattingArea.append("주소 설정 오류");
+				}
+			}
 		}
 	}
 
