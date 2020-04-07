@@ -66,19 +66,20 @@ public class ChatAppLayer implements BaseLayer {
 	public boolean Send(byte[] input, int length) {
 		/*
 		 * 과제
-		 * 
 		 */
+		byte[] bytes = ObjToByte(m_sHeader, input, length);
+		this.GetUnderLayer().Send(bytes, length+10);
 		return true;
 	}
 
 	public byte[] RemoveCappHeader(byte[] input, int length) {
-		
 	/*
 	 * 과제
-	 * 
-	 * 
-	 * */	
-		return input;// 변경하세요 필요하시면
+	 */
+		for (int i = 0; i < (input.length-10); i++) {
+			input[i] = input[i+10];
+		}
+		return input;
 	}
 
 	public synchronized boolean Receive(byte[] input) {

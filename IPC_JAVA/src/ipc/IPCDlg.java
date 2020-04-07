@@ -194,8 +194,8 @@ public class IPCDlg extends JFrame implements BaseLayer {//JFrame사용한 인터페이
 	public boolean Receive(byte[] input) {	
 /*
  * 	과제 채팅 화면에 채팅 보여주기
- * 
  */
+		ChattingArea.append("[Rcvd] : " + new String(input) + "\n");
 		return true;
 	}
 
