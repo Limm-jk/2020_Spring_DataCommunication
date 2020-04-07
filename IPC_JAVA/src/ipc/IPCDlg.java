@@ -19,7 +19,7 @@ import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
-public class IPCDlg extends JFrame implements BaseLayer {
+public class IPCDlg extends JFrame implements BaseLayer {//JFrame사용한 인터페이스 클래스
 
 	public int nUpperLayerCount = 0;
 	public String pLayerName = null;
@@ -50,20 +50,13 @@ public class IPCDlg extends JFrame implements BaseLayer {
 	String Text;
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		m_LayerMgr.AddLayer(new SocketLayer("Socket"));
-		/*
-		 과제 빈칸 채우기
-		 ChatApp LayerManager에 추가
-		 
-		 */
+		m_LayerMgr.AddLayer(new ChatAppLayer("Chat"));//과제
 		m_LayerMgr.AddLayer(new IPCDlg("GUI"));
-
 		/*
 		 과제 ChatApp 연결하기 아래부분 수정
-		 
 		 */
-		m_LayerMgr.ConnectLayers(" Socket ( *GUI ) ");
+		m_LayerMgr.ConnectLayers(" Socket ( *Chat (*GUI) ) ");
 	}
 
 	public IPCDlg(String pName) {
