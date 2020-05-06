@@ -139,7 +139,6 @@ class Receive_Thread implements Runnable {
 					data = new byte[1528]; // Ethernet Maxsize + Ethernet Headersize;
 					reciever.read(data, 0, data.length);
 					UpperLayer.Receive(data);
-
 				}
 			} catch (Throwable e) {
 				e.printStackTrace();

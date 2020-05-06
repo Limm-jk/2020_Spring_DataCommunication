@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="IPC_JAVA:jar">
+    <output-path>$PROJECT_DIR$/classes/artifacts/IPC_JAVA_jar</output-path>
+    <root id="archive" name="IPC_JAVA.jar">
+      <element id="module-output" name="IPC_JAVA" />
+    </root>
+  </artifact>
+</component>
