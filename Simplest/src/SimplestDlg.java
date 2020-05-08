@@ -55,9 +55,10 @@ public class SimplestDlg extends JFrame implements BaseLayer {
 
 		m_LayerMgr.AddLayer(new NILayer("NI"));
 		m_LayerMgr.AddLayer(new EthernetLayer("Ethernet"));
+		m_LayerMgr.AddLayer(new ChatAppLayer("ChatApp"));
 		m_LayerMgr.AddLayer(new SimplestDlg("GUI"));
 
-		m_LayerMgr.ConnectLayers(" NI ( *Ethernet ( *GUI ) )");
+		m_LayerMgr.ConnectLayers(" NI ( *Ethernet ( *ChatApp ( *GUI ) ) )");
 	}
 
 	class setAddressListener implements ActionListener {
@@ -102,17 +103,17 @@ public class SimplestDlg extends JFrame implements BaseLayer {
 
 			if (e.getSource() == Chat_send_Button) {
 				if (Setting_Button.getText() == "Reset") {
-					for(int i = 0 ; i < 10; i++) {
-						String input = "Test "+ i;
+					//for(int i = 0 ; i < 10; i++) {
+						String input = ChattingWrite.getText();
 						ChattingArea.append("[SEND] : " + input + "\n");
 						byte[] bytes = input.getBytes();
-						m_LayerMgr.GetLayer("Ethernet").Send(bytes, bytes.length);
-						if(m_LayerMgr.GetLayer("GUI").Receive()){
-							input = Text;
-							ChattingArea.append("[RECV] : " + input + "\n");
-							continue;
-						}break;
-					}
+						m_LayerMgr.GetLayer("ChatApp").Send(bytes, bytes.length);
+//						if(m_LayerMgr.GetLayer("GUI").Receive()){
+//							input = Text;
+//							ChattingArea.append("[RECV] : " + input + "\n");
+//							continue;
+//						}break;
+//					}
 
 				} else {
 					JOptionPane.showMessageDialog(null, "주소 설정 오류");
