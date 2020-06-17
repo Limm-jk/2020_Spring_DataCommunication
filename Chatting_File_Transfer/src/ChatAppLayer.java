@@ -11,7 +11,7 @@ public class ChatAppLayer implements BaseLayer {
 
     private byte[] fragBytes;
     private int fragCount = 0;
-    private ArrayList<Boolean> ackChk = new ArrayList<Boolean>();
+   // private ArrayList<Boolean> ackChk = new ArrayList<Boolean>();
 
     private class _CHAT_APP {
         byte[] capp_totlen;
@@ -32,7 +32,7 @@ public class ChatAppLayer implements BaseLayer {
         // TODO Auto-generated constructor stub
         pLayerName = pName;
         ResetHeader();
-        ackChk.add(true);
+        //ackChk.add(true);
     }
 
     private void ResetHeader() {
@@ -59,48 +59,48 @@ public class ChatAppLayer implements BaseLayer {
         return input;
     }
 
-    private void waitACK() { //ACK 체크
-        while (ackChk.size() <= 0) {
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        ackChk.remove(0);
-    }
+//    private void waitACK() { //ACK 체크
+//        while (ackChk.size() <= 0) {
+//            try {
+//                Thread.sleep(10);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//        ackChk.remove(0);
+//    }
   /**/
     private void fragSend(byte[] input, int length) {
-        byte[] bytes = new byte[10];
+        byte[] bytes = new byte[1456];
         int i = 0;
         m_sHeader.capp_totlen = intToByte2(length);
         m_sHeader.capp_type = (byte) (0x01);
 
         // 첫번째 전송
-        System.arraycopy(input, 0, bytes, 0, 10);
-        bytes = objToByte(m_sHeader, bytes, 10);
+        System.arraycopy(input, 0, bytes, 0, 1456);
+        bytes = objToByte(m_sHeader, bytes, 1456);
         this.GetUnderLayer().Send(bytes, bytes.length);
 
-        int maxLen = length / 10;
+        int maxLen = length / 1456;
         	/* 중간 단편화  */
         m_sHeader.capp_type = (byte) (0x02);
         m_sHeader.capp_totlen = intToByte2(10);
         for(i = 1; i < maxLen; i ++) {
-        	waitACK();
+        	//waitACK();
         	//마지막일경우
         	if(i + 1 < maxLen && length%10 == 0)
         		m_sHeader.capp_type = (byte) (0x03);
-        	System.arraycopy(input, 10 * i, bytes, 0, 10);
-        	bytes = objToByte(m_sHeader, bytes, 10);
+        	System.arraycopy(input, 1456 * i, bytes, 0, 1456);
+        	bytes = objToByte(m_sHeader, bytes, 1456);
         	this.GetUnderLayer().Send(bytes, bytes.length);
         }
-        if (length % 10 != 0) {
-        	waitACK();
+        if (length % 1456 != 0) {
+        	//waitACK();
             m_sHeader.capp_type = (byte) (0x03);
             /*과제  */
-            m_sHeader.capp_totlen = intToByte2(length%10);
-            bytes = new byte[length % 10];
-            System.arraycopy(input, length - (length % 10), bytes, 0, length % 10);
+            m_sHeader.capp_totlen = intToByte2(length%1456);
+            bytes = new byte[length % 1456];
+            System.arraycopy(input, length - (length % 1456), bytes, 0, length % 1456);
             bytes = objToByte(m_sHeader, bytes, bytes.length);
             this.GetUnderLayer().Send(bytes, bytes.length);
         }
@@ -111,8 +111,8 @@ public class ChatAppLayer implements BaseLayer {
         m_sHeader.capp_totlen = intToByte2(length);
         m_sHeader.capp_type = (byte) (0x00);
  
-        waitACK();//ACK들오는지 확인
-        if (length > 10) {
+        //waitACK();//ACK들오는지 확인
+        if (length > 1456) {
         	fragSend(input, length);
         } //10보다 클시 fragsend를 이용하여 단편화 시켜서 송신
         else {
@@ -127,7 +127,7 @@ public class ChatAppLayer implements BaseLayer {
         int tempType = 0;
 
         if (input == null) {
-        	ackChk.add(true);
+        	//ackChk.add(true);
         	return true;
         }
         

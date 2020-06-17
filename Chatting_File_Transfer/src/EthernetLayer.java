@@ -64,12 +64,8 @@ public class EthernetLayer implements BaseLayer {
 
 	// 브로드 캐스트일 경우, type이 0xff
 	public boolean Send(byte[] input, int length) {
-		if (input == null && length == 0) // ack
-			m_sHeader.enet_type = intToByte2(2);
-		else if (isBroadcast(m_sHeader.enet_dstaddr.addr)) // broadcast
-			m_sHeader.enet_type = intToByte2(0xff);
-		else // nomal
-			m_sHeader.enet_type = intToByte2(1);
+		m_sHeader.enet_type[0] = (byte) 0x20;
+		m_sHeader.enet_type[1] = (byte) 0x80;
 		/*
 		과제#4
 		위에서 지정해준 type을 담은 헤더를 붙여서 하위계층으로 send시키는 과제
@@ -91,21 +87,17 @@ public class EthernetLayer implements BaseLayer {
 		byte[] temp_src = m_sHeader.enet_srcaddr.addr;
 		int temp_type = byte2ToInt(input[12], input[13]); 
 		
-		/*
-		과제#4
-		ack일 경우(type이 2) 상위  레이어 호출
-		그냥 데이터일 경우 (type이 1) chkaddress / isbroadcast 
-		/ !ismypacket이 다 true일 경우(패킷은 false) 데이터 상위로
-		 */
-		if (temp_type == 2) {
-			this.GetUpperLayer(0).Receive(null);
-			//ack는 input == null && length == 0임
-		}
-		else if (temp_type == 1) {
-			if((!isMyPacket(input)) && (isBroadcast(input)) && (chkAddr(input))) {
+		
+		if((!isMyPacket(input)) || (isBroadcast(input)) || (chkAddr(input))) {
+			if(temp_type == (byte)0x2080){
 				data = RemoveEthernetHeader(input, input.length);
-				this.GetUpperLayer(0).Receive(data);
-				this.Send(null, 0);//ack
+				((ChatAppLayer)this.GetUpperLayer(0)).Receive(data);
+				
+				return true;
+			}
+			else if(temp_type == (byte)0x2090){
+				data = RemoveEthernetHeader(input, input.length);
+				((FileAppLayer)this.GetUpperLayer(1)).Receive(data);
 				return true;
 			}
 		}
@@ -200,8 +192,16 @@ public class EthernetLayer implements BaseLayer {
 		pUULayer.SetUnderLayer(this);
 	}
 
-	public void fileSend(byte[] bytes, int i) {
+	public boolean fileSend(byte[] input, int length) {
 		// TODO Auto-generated method stub
-		
+		m_sHeader.enet_type[0] = (byte) 0x20;
+		m_sHeader.enet_type[1] = (byte) 0x90;
+		/*
+		과제#4
+		위에서 지정해준 type을 담은 헤더를 붙여서 하위계층으로 send시키는 과제
+		*/
+		byte[] bytes = ObjToByte(m_sHeader, input, length);
+		this.GetUnderLayer().Send(bytes, length + 14);
+		return true;
 	}
 }

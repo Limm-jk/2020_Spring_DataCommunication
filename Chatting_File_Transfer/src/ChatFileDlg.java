@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -55,6 +56,8 @@ public class ChatFileDlg extends JFrame implements BaseLayer {
 	JTextArea FileUrl;
 	JProgressBar progressBar;
 	
+	File file;
+	
 	static JComboBox<String> NICComboBox;
 
 	int adapterNumber = 0;
@@ -72,13 +75,13 @@ public class ChatFileDlg extends JFrame implements BaseLayer {
 		m_LayerMgr.AddLayer(new FileAppLayer("FileApp"));
 		m_LayerMgr.AddLayer(new ChatFileDlg("GUI"));
 
-		m_LayerMgr.ConnectLayers(" NI ( *Ethernet ( *ChatApp ( *GUI ) *FileApp ( *GUI ) )");
+		m_LayerMgr.ConnectLayers(" NI ( *Ethernet ( *ChatApp ( *GUI ) *FileApp ( +GUI ) )");
 	}
 
 	public ChatFileDlg(String pName) {
 		pLayerName = pName;
 
-		setTitle("Stop & Wait Protocol");
+		setTitle("CHAT & FILE TRANSFER");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(250, 250, 644, 425);
 		contentPane = new JPanel();
@@ -300,9 +303,44 @@ public class ChatFileDlg extends JFrame implements BaseLayer {
 					JOptionPane.showMessageDialog(null, "Address Setting Error!.");//주소설정 에러
 				}
 			}
+			if(e.getSource() == FileSelectButton){
+				JFileChooser choose = new JFileChooser();
+				int file_val = choose.showOpenDialog(null);
+				if(file_val == JFileChooser.APPROVE_OPTION){
+					file = choose.getSelectedFile();
+					FileUrl.setText(file.getPath());
+					FileSelectButton.setEnabled(true);
+					FileUrl.setEnabled(false);
+					FileSendButton.setEnabled(true);
+					progressBar.setValue(0);
+				}
+			}
+			
+			if(e.getSource() == FileSendButton){
+				FileAppLayer FAlayer = (FileAppLayer)m_LayerMgr.GetLayer("FileApp");
+				File_Send_Thread FST = new File_Send_Thread(FAlayer);
+				Thread Send_Thread = new Thread(FST);
+				Send_Thread.start();
+			}
 		}
 	}
-
+	
+	class File_Send_Thread implements Runnable{
+		FileAppLayer FAL;
+		
+		public File_Send_Thread(FileAppLayer layer) {
+			// TODO Auto-generated constructor stub
+			this.FAL = layer;
+		}
+		
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			FAL.setAndStartSendFile();
+		}
+		
+		
+	}
 	public String get_MacAddress(byte[] byte_MacAddress) { //MAC Byte주소를 String으로 변환
 
 		String MacAddress = "";
@@ -377,7 +415,7 @@ public class ChatFileDlg extends JFrame implements BaseLayer {
 
 	public File getFile() {
 		// TODO Auto-generated method stub
-		return null;
+		return this.file;
 	}
 
 }
